@@ -5,7 +5,7 @@ var gameScene = cc.Scene.extend({
   onEnter:function(){
     this._super();
 
-    //レイヤー用のオブジェクトを生成して、Sceneオブジェクトの子として追加
+    //レイヤーをSceneの子に追加
     var gameLayer = new game();
     gameLayer.init();
     this.addChild(gameLayer);
@@ -22,15 +22,22 @@ var game = cc.Layer.extend({
   init:function(){
     this._super();
 
+    //まず灰色の背景をレイヤに追加
     backgroundLayer = cc.LayerColor.create(new cc.Color(40,40,40,255),320,480);
     this.addChild(backgroundLayer);
-    var target = cc.Sprite.create(res.target_png);  //Spriteクラスで画像を生成出来るみたい
 
+    //png画像を100回生成してみる(笑)
+    for(var i = 0; i < 100 ;i++){
+        var img = cc.Sprite.create(res.target_png);
+        var x = Math.floor(Math.random() * 320);
+        var y = Math.floor(Math.random() * 480);
+        backgroundLayer.addChild(img,0);
+        img.setPosition(x,y);
+    }
 
-    backgroundLayer.addChild(target, 0);            //Layerオブジェクトの子として追加してやる必要があるようだ
-    target.setPosition(160,240);                    //これで、画面の中心座標をセット
-    setTimeout(function(){
-      backgroundLayer.removeChild(target)
-    },3000);
+    //3秒でpng画像が消えるようにする
+    // setTimeout(function(){
+    //   backgroundLayer.removeChild(target)
+    // },3000);
   }
 });
