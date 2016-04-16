@@ -52,24 +52,20 @@
  *
  */
 
+//メインルーチン実行前処理?
 cc.game.onStart = function(){
-    if(!cc.sys.isNative && document.getElementById("cocosLoading")) //If referenced loading.js, please remove it
+    //ここら辺が表示の設定に当たるとのこと
+    if(!cc.sys.isNative && document.getElementById("cocosLoading"))
         document.body.removeChild(document.getElementById("cocosLoading"));
-
-    // Pass true to enable retina display, on Android disabled by default to improve performance
-    cc.view.enableRetina(cc.sys.os === cc.sys.OS_IOS ? true : false);
-    // Adjust viewport meta
+    cc.view.enableRetina(false);
     cc.view.adjustViewPort(true);
-    // Setup the resolution policy and design resolution size
-    cc.view.setDesignResolutionSize(960, 640, cc.ResolutionPolicy.SHOW_ALL);
-    // Instead of set design resolution, you can also set the real pixel resolution size
-    // Uncomment the following line and delete the previous line.
-    // cc.view.setRealPixelResolution(960, 640, cc.ResolutionPolicy.SHOW_ALL);
-    // The game will be resized when browser size change
+    //以下で、全環境でこの解像度で実行ということになるらしい
+    cc.view.setDesignResolutionSize(320, 480, cc.ResolutionPolicy.SHOW_ALL);
     cc.view.resizeWithBrowserSize(true);
-    //load resources
-    cc.LoaderScene.preload(g_resources, function () {
-        cc.director.runScene(new HelloWorldScene());
-    }, this);
+
+    //これがゲームの各画面にあたるらしい(シーンと呼ぶ)
+    //cc.director.runScene(new HelloWorldScene());
+    cc.director.runScene(new gameScene());
 };
+//これがメインルーチン?
 cc.game.run();
