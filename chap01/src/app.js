@@ -1,53 +1,36 @@
-
-// var HelloWorldLayer = cc.Layer.extend({
-//     sprite:null,
-//     ctor:function () {
-//         //////////////////////////////
-//         // 1. super init first
-//         this._super();
-//
-//         /////////////////////////////
-//         // 2. add a menu item with "X" image, which is clicked to quit the program
-//         //    you may modify it.
-//         // ask the window size
-//         var size = cc.winSize;
-//
-//         /////////////////////////////
-//         // 3. add your codes below...
-//         // add a label shows "Hello World"
-//         // create and initialize a label
-//         var helloLabel = new cc.LabelTTF("Hello World", "Arial", 38);
-//         // position the label on the center of the screen
-//         helloLabel.x = size.width / 2;
-//         helloLabel.y = size.height / 2 + 200;
-//         // add the label as a child to this layer
-//         this.addChild(helloLabel, 5);
-//
-//         // add "HelloWorld" splash screen"
-//         this.sprite = new cc.Sprite(res.HelloWorld_png);
-//         this.sprite.attr({
-//             x: size.width / 2,
-//             y: size.height / 2
-//         });
-//         this.addChild(this.sprite, 0);
-//
-//         return true;
-//     }
-// });
-//
-// var HelloWorldScene = cc.Scene.extend({
-//     onEnter:function () {
-//         this._super();
-//         var layer = new HelloWorldLayer();
-//         this.addChild(layer);
-//     }
-// });
-
 //これがmain.jsに書いたシーンと対応する。
-//関数を引数に渡して、やりたいことを指定するようだ。
+//Scene - Layer - Spriteという親子関係になっている?
+
 var gameScene = cc.Scene.extend({
   onEnter:function(){
     this._super();
-    cc.log("my awesome game starts here");
+
+    //レイヤー用のオブジェクトを生成して、Sceneオブジェクトの子として追加
+    var gameLayer = new game();
+    gameLayer.init();
+    this.addChild(gameLayer);
+
+    //以下でデバッグコンソールにログ表示
+    //cc.log("my awesome game starts here");
+  }
+});
+
+var backgroundLayer;
+
+//レイヤー用オブジェクトの定義
+var game = cc.Layer.extend({
+  init:function(){
+    this._super();
+
+    backgroundLayer = cc.LayerColor.create(new cc.Color(40,40,40,255),320,480);
+    this.addChild(backgroundLayer);
+    var target = cc.Sprite.create(res.target_png);  //Spriteクラスで画像を生成出来るみたい
+
+
+    backgroundLayer.addChild(target, 0);            //Layerオブジェクトの子として追加してやる必要があるようだ
+    target.setPosition(160,240);                    //これで、画面の中心座標をセット
+    setTimeout(function(){
+      backgroundLayer.removeChild(target)
+    },3000);
   }
 });

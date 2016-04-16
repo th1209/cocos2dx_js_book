@@ -65,7 +65,10 @@ cc.game.onStart = function(){
 
     //これがゲームの各画面にあたるらしい(シーンと呼ぶ)
     //cc.director.runScene(new HelloWorldScene());
-    cc.director.runScene(new gameScene());
+    cc.LoaderScene.preload(g_resources,function(){
+      cc.director.runScene(new gameScene());
+    },this);
 };
+
 //これがメインルーチン?
 cc.game.run();
