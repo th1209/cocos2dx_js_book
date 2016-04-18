@@ -1,10 +1,14 @@
 //グローバル変数
 var gameArray = [0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7];
 var pickedTiles = [];
+var scoreText;
+var moves = 0;
 
 var gameScene = cc.Scene.extend({
     onEnter:function(){
         this._super();
+
+        gameArray = shuffle(gameArray);
 
         gameLayer = new game();
         gameLayer.init();
@@ -22,6 +26,11 @@ var game = cc.Layer.extend({
             cc.color(0,0,0,255),            //黒。α値は255で最大であり、不透明となる
             cc.color(0x64,0x82,0xB4,255));  //16進数でも記述可能
         this.addChild(gradient);
+
+        //スコア用のテキストを表示
+        scoreText = cc.LabelTTF.create("Moves: 0","Arial","32",cc.TEXT_ALIGNMENT_CENTER);
+        this.addChild(scoreText);
+        scoreText.setPosition(90,50);
 
         //16個の背景を表示
         for(i = 0; i < 16; i++){
@@ -72,6 +81,10 @@ var MemoryTile = cc.Sprite.extend({
 
 //グローバル関数
 function checkTiles(){
+    //カードをめくる度にテキストを更新
+    moves++;
+    scoreText.setString("Moves" + moves);
+
     var pause = setTimeout(function(){
         //タイルが一致しない場合
         if(pickedTiles[0].pictureValue != pickedTiles[1].pictureValue){
@@ -86,3 +99,10 @@ function checkTiles(){
         pickedTiles = [];
     },2000);//2秒間待ち続ける
 }
+
+var shuffle = function(v){
+  for(var j, x , i=v.length;
+      i;//iが0になるまで(配列の長さ分)
+      j = parseInt(Math.random() * i), x = v[--i], v[i] = v[j], v[j] = x);
+    return v;
+};
