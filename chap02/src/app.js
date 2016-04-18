@@ -1,4 +1,6 @@
 
+var gameArray = [0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7];
+
 var gameScene = cc.Scene.extend({
     onEnter:function(){
         this._super();
@@ -22,8 +24,8 @@ var game = cc.Layer.extend({
 
         //16個の背景を表示
         for(i = 0; i < 16; i++){
-            //var tile = cc.Sprite.create(res.cover_png);
             var tile = new MemoryTile();
+            tile.pictureValue = gameArray[i];
             this.addChild(tile,0);
             tile.setPositionX(49+i%4*74);               //x座標は4回毎に74*xをリセット
             tile.setPositionY(400-Math.floor(i/4)*74);  //y座標は、行が増えるたびに+74
@@ -44,7 +46,8 @@ var listener = cc.EventListener.create({
         var targetRectangle = cc.rect(0,0,targetSize.width,targetSize.height);
         //タイル内に含まれていれば、if内の処理を実施
         if(cc.rectContainsPoint(targetRectangle, location)){
-            console.log("I picked a tile!!");
+            target.initWithFile("res/tile_" + target.pictureValue + ".png");
+            //console.log("I picked a tile!!");
         }
     }
 });
