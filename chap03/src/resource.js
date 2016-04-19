@@ -1,5 +1,9 @@
+
 var res = {
-    HelloWorld_png : "res/HelloWorld.png",
+    background_png : "res/background.png",
+    ship_png : "res/ship.png",
+    asteroid_png : "res/asteroid.png",
+    particle_png : "res/particle.png"
 };
 
 var g_resources = [];
