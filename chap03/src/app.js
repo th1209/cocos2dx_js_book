@@ -4,6 +4,7 @@ var gameLayer;
 var scrollSpeed = 1;
 var ship;
 var gameGravity = -0.05;
+var gameThrust = 0.1;
 
 
 //グローバルオブジェクト
@@ -19,6 +20,17 @@ var gameScene = cc.Scene.extend({
 var game = cc.Layer.extend({
     init:function(){
         this._super();
+
+        //このオブジェクトをイベントリスナに登録
+        cc.eventManager.addListener({
+            event: cc.EventListener.MOUSE,
+            onMouseDown: function(event){
+                ship.engineOn = true;
+            },
+            onMouseUp: function(event){
+                ship.engineOn = false;
+            }
+        },this);
 
         //LayerにSpriteを追加
         backGround = new ScrollingBG();
@@ -60,11 +72,15 @@ var Ship = cc.Sprite.extend({
         this._super();
         this.initWithFile(res.ship_png);
         this.ySpeed = 0;
+        this.engineOn = false;
     },
     onEnter:function(){
         this.setPosition(60,160);
     },
     updateY:function(){
+        if(this.engineOn){
+            this.ySpeed += gameThrust;
+        }
         this.setPosition(this.getPosition().x, this.getPosition().y+this.ySpeed);
         this.ySpeed += gameGravity;
     }
