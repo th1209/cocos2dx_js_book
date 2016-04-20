@@ -5,6 +5,7 @@ var scrollSpeed = 1;
 var ship;
 var gameGravity = -0.05;
 var gameThrust = 0.1;
+var emitter; //放射体とか発光体とかいう意味
 
 
 //グローバルオブジェクト
@@ -43,6 +44,14 @@ var game = cc.Layer.extend({
 
         ship = new Ship();
         this.addChild(ship);
+
+        //エミッタの生成
+        emitter = cc.ParticleSun.create();
+        this.addChild(emitter,1);
+        var myTexture = cc.textureCache.addImage(res.particle_png);
+        emitter.setTexture(myTexture);
+        emitter.setStartSize(2);
+        emitter.setEndSize(4);
     },
     //scheduleUpdate関数実行後、実際に呼ばれるのはupdate関数の処理
     update:function(dt){
@@ -91,6 +100,10 @@ var Ship = cc.Sprite.extend({
     updateY:function(){
         if(this.engineOn){
             this.ySpeed += gameThrust;
+            emitter.setPosition(this.getPosition().x-25, this.getPosition().y);
+        }else{
+            //-250なので、エンジンがoffの時はエミッタが画面外に生成される(別に250でなくとも構わない)
+            emitter.setPosition(this.getPosition().x-250, this.getPosition().y);
         }
         //無敵モード時処理
         if(this.invulnerability > 0){
