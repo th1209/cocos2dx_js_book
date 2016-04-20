@@ -83,6 +83,7 @@ var Ship = cc.Sprite.extend({
         this.initWithFile(res.ship_png);
         this.ySpeed = 0;
         this.engineOn = false;
+        this.invulnerability = 0;
     },
     onEnter:function(){
         this.setPosition(60,160);
@@ -91,8 +92,16 @@ var Ship = cc.Sprite.extend({
         if(this.engineOn){
             this.ySpeed += gameThrust;
         }
+        //無敵モード時処理
+        if(this.invulnerability > 0){
+            this.invulnerability--;
+            this.setOpacity(255 - this.getOpacity());
+        }
         this.setPosition(this.getPosition().x, this.getPosition().y+this.ySpeed);
         this.ySpeed += gameGravity;
+        if(this.getPosition().y < 0 || this.getPosition().y > 320){
+            restartGame();
+        }
     }
 });
 
@@ -117,7 +126,8 @@ var Asteroid = cc.Sprite.extend({
         //衝突判定
         var shipBoundingBox = ship.getBoundingBox();
         var asteroidBoundingBox = this.getBoundingBox();
-        if(cc.rectIntersectsRect(shipBoundingBox,asteroidBoundingBox)){
+        if(cc.rectIntersectsRect(shipBoundingBox,asteroidBoundingBox)
+           && ship.invulnerability==0){//無敵な時は、if文を通らない
             gameLayer.removeAsteroid(this);
             restartGame();
         }
@@ -133,5 +143,6 @@ var Asteroid = cc.Sprite.extend({
 function restartGame(){
     ship.ySpeed = 0;
     ship.setPosition(ship.getPosition().x,160);
+    ship.invulnerability=100;
 }
 
