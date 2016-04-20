@@ -32,19 +32,29 @@ var game = cc.Layer.extend({
             }
         },this);
 
-        //LayerにSpriteを追加
+        //背景の処理
         backGround = new ScrollingBG();
         this.addChild(backGround);
-        ship = new Ship();
-        this.addChild(ship);
-
         //scheduleUpdate関数は、フレームの更新毎に呼び出される
         this.scheduleUpdate();
+
+        //これは、0.5秒毎に第一引数を呼び出すという意味
+        this.schedule(this.addAsteroid,0.5);
+
+        ship = new Ship();
+        this.addChild(ship);
     },
-    //実際に呼ばれるのはupdate関数の処理
+    //scheduleUpdate関数実行後、実際に呼ばれるのはupdate関数の処理
     update:function(dt){
         backGround.scroll();
         ship.updateY();
+    },
+    addAsteroid:function(event){
+        var asteroid = new Asteroid;
+        this.addChild(asteroid,1);
+    },
+    removeAsteroid:function(asteroid){
+        this.removeChild(asteroid);
     }
 });
 
@@ -83,6 +93,31 @@ var Ship = cc.Sprite.extend({
         }
         this.setPosition(this.getPosition().x, this.getPosition().y+this.ySpeed);
         this.ySpeed += gameGravity;
+    }
+});
+
+var Asteroid = cc.Sprite.extend({
+    ctor:function(){
+        this._super();
+        this.initWithFile(res.asteroid_png);
+    },
+    onEnter:function(){
+        this._super();
+
+        this.setPosition(600, Math.random()*320);
+
+        //MoveToメソッドは、移動を表す。第一引数がduration,第二引数がベクトル
+        //また、newではなくcreateメソッドを使う?
+        var moveAction = cc.MoveTo.create(2.5, new cc.Point(-100, Math.random()*320));
+        //runActionの引数に渡すとSpriteオブジェクトを動かせる
+        this.runAction(moveAction);
+        this.scheduleUpdate();
+    },
+    update:function(dt){
+        //x座標が画面外に出たら、オブジェクトを消去
+        if(this.getPosition().x < -50){
+            gameLayer.removeAsteroid(this);
+        }
     }
 });
 
