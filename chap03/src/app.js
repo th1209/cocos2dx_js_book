@@ -114,10 +114,24 @@ var Asteroid = cc.Sprite.extend({
         this.scheduleUpdate();
     },
     update:function(dt){
+        //衝突判定
+        var shipBoundingBox = ship.getBoundingBox();
+        var asteroidBoundingBox = this.getBoundingBox();
+        if(cc.rectIntersectsRect(shipBoundingBox,asteroidBoundingBox)){
+            gameLayer.removeAsteroid(this);
+            restartGame();
+        }
+
         //x座標が画面外に出たら、オブジェクトを消去
         if(this.getPosition().x < -50){
             gameLayer.removeAsteroid(this);
         }
     }
 });
+
+//グローバル関数
+function restartGame(){
+    ship.ySpeed = 0;
+    ship.setPosition(ship.getPosition().x,160);
+}
 
