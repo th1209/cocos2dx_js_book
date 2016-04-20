@@ -130,7 +130,7 @@ var Asteroid = cc.Sprite.extend({
 
         //MoveToメソッドは、移動を表す。第一引数がduration,第二引数がベクトル
         //また、newではなくcreateメソッドを使う?
-        var moveAction = cc.MoveTo.create(2.5, new cc.Point(-100, Math.random()*320));
+        var moveAction = cc.MoveTo.create(3.5, new cc.Point(-100, Math.random()*320));
         //runActionの引数に渡すとSpriteオブジェクトを動かせる
         this.runAction(moveAction);
         this.scheduleUpdate();
