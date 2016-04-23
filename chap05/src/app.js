@@ -1,5 +1,5 @@
 var gameScene = cc.Scene.extend({
-    onEnter:function(){
+    onEnter:function () {
         this._super();
         gameLayer = new game();
         gameLayer.init();
@@ -8,71 +8,55 @@ var gameScene = cc.Scene.extend({
 });
 
 var game = cc.Layer.extend({
-    init: function(){
+    init:function () {
         this._super();
-
         this.audioEngine = cc.audioEngine;
-
-        var playSoundMenu = new cc.MenuItemFont.create("Play Sound Effect", this.playSound, this);
-        playSoundMenu.setPosition(new cc.Point(0, 350));
-
-        var playBGMusicMenu = new cc.MenuItemFont.create("Play BG music", this.playBGMusic, this);
-        playBGMusicMenu.setPosition(new cc.Point(0, 300));
-
-        var stopBGMusicMenu = new cc.MenuItemFont.create("Stop BG music", this.stopBGMusic, this);
-        stopBGMusicMenu.setPosition(new cc.Point(0, 250));
-
-        var musicUpMenu = new cc.MenuItemFont.create("Music volume Up", this.musicUp, this);
-        musicUpMenu.setPosition(new cc.Point(0, 200));
-
-        var musicDownMenu = new cc.MenuItemFont.create("Music volume Down", this.musicDown, this);
-        musicDownMenu.setPosition(new cc.Point(0, 150));
-
-        var effectsUpMenu = new cc.MenuItemFont.create("Effects volume Up", this.effectsUp, this);
-        effectsUpMenu.setPosition(new cc.Point(0, 100));
-
-        var effectsDownMenu = new cc.MenuItemFont.create("Effects volume Down", this.effectsDown, this);
-        effectsDownMenu.setPosition(new cc.Point(0, 50));
-
-        //Menuクラスに、各MenuItemFontを渡す
+        var playSoundMenu = new cc.MenuItemFont.create("Play Sound effect",this.playSound,this);
+        playSoundMenu.setPosition(new cc.Point(0,350));
+        var playBGMusicMenu = new cc.MenuItemFont.create("Play BG music",this.playBGMusic,this);
+        playBGMusicMenu.setPosition(new cc.Point(0,300));
+        var stopBGMusicMenu = new cc.MenuItemFont.create("Stop BG music",this.stopBGMusic,this);
+        stopBGMusicMenu.setPosition(new cc.Point(0,250));
+        var musicUpMenu = new cc.MenuItemFont.create("Music volume Up",this.musicUp,this);
+        musicUpMenu.setPosition(new cc.Point(0,200));
+        var musicDownMenu = new cc.MenuItemFont.create("Music volume Down",this.musicDown,this);
+        musicDownMenu.setPosition(new cc.Point(0,150));
+        var effectsUpMenu = new cc.MenuItemFont.create("Effects volume Up",this.effectsUp,this);
+        effectsUpMenu.setPosition(new cc.Point(0,100));
+        var effectsDownMenu = new cc.MenuItemFont.create("Effects volume Down",this.effectsDown,this);
+        effectsDownMenu.setPosition(new cc.Point(0,50));
         var menu = cc.Menu.create(playSoundMenu,playBGMusicMenu,stopBGMusicMenu,musicUpMenu,musicDownMenu,effectsUpMenu,effectsDownMenu);
-
         menu.setPosition(new cc.Point(160,40));
         this.addChild(menu);
-
-
-
-
-
     },
-
-
-
-
-
-
-
+    playSound:function(){
+        this.audioEngine.playEffect(res.bang_mp3);
+    },
+    playBGMusic:function(){
+        if(!this.audioEngine.isMusicPlaying()){
+            this.audioEngine.playMusic(res.loop_mp3,true);
+        }
+    },
+    stopBGMusic:function(){
+        if(this.audioEngine.isMusicPlaying()){
+            this.audioEngine.stopMusic();
+        }
+    },
+    musicUp:function(){
+        this.audioEngine.setMusicVolume(this.audioEngine.getMusicVolume()+0.1);
+    },
+    musicDown:function(){
+        this.audioEngine.setMusicVolume(this.audioEngine.getMusicVolume()-0.1);
+    },
+    effectsUp:function(){
+        this.audioEngine.setEffectsVolume(this.audioEngine.getEffectsVolume()+0.1);
+    },
+    effectsDown:function(){
+        this.audioEngine.setEffectsVolume(this.audioEngine.getEffectsVolume()-0.1);
+    }
 });
 
 
-// var level = [
-//     [1,1,1,1,1,1,1],
-//     [1,1,0,0,0,0,1],
-//     [1,1,3,0,2,0,1],
-//     [1,0,0,4,0,0,1],
-//     [1,0,3,1,2,0,1],
-//     [1,0,0,1,1,1,1],
-//     [1,1,1,1,1,1,1],
-// ];
-// var cratesArray = [];
-// var playerPosition;
-// var playerSprite;
-//
-// var startTouch;
-// var endTouch;
-// var swipeTolerance = 10;
-//
-//
 // var gameScene = cc.Scene.extend({
 //     onEnter:function(){
 //         this._super();
@@ -82,134 +66,64 @@ var game = cc.Layer.extend({
 //     }
 // });
 //
-// var listener = cc.EventListener.create({
-//     event: cc.EventListener.TOUCH_ONE_BY_ONE,
-//     swallowTouches: true,
-//     onTouchBegin: function(touch,event){
-//         startTouch = touch.getLocation();
-//         return true;
-//     },
-//     onTouchEnd: function(touch,event){
-//         endTouch = touch.getLocation();
-//         swipeDirection();
-//     }
-// });
-//
 // var game = cc.Layer.extend({
-//     init:function(){
+//     init: function(){
 //         this._super();
 //
-//         //スプライトシートからのデータの取得は以下のように
-//         cache = cc.spriteFrameCache;
-//         cache.addSpriteFrames(res.spritesheet_plist);
+//         //audioEngineを使って、音声を再生する(唯一のグローバルオブジェクト?)
+//         this.audioEngine = cc.audioEngine;
 //
-//         var backGroundSprite = cc.Sprite.create(cache.getSpriteFrame("background.png"));
-//         backGroundSprite.getTexture().setAliasTexParameters();//アンチエイリアス処理(スプライトシートの場合、シート内全画像に影響)
-//         backGroundSprite.setPosition(240,160);
-//         backGroundSprite.setScale(5);   //スプライトの拡大・縮小(5倍)
-//         this.addChild(backGroundSprite);
+//         var playSoundMenu = new cc.MenuItemFont.create("Play Sound Effect", this.playSound, this);
+//         playSoundMenu.setPosition(new cc.Point(0, 350));
 //
-//         var levelSprite = cc.Sprite.create(cache.getSpriteFrame("level.png"));
-//         levelSprite.setPosition(240,110);
-//         levelSprite.setScale(5);
-//         this.addChild(levelSprite);
+//         var playBGMusicMenu = new cc.MenuItemFont.create("Play BG music", this.playBGMusic, this);
+//         playBGMusicMenu.setPosition(new cc.Point(0, 300));
 //
-//         //プレイヤーと木箱の配置
-//         for(i = 0; i < 7; i++){
-//             cratesArray[i] = [];
-//             for(j = 0; j < 7; j++){
-//                 switch(level[i][j]){
-//                     //プレイヤーの配置
-//                     case 4:
-//                     case 6:
-//                         playerSprite = cc.Sprite.create(cache.getSpriteFrame("player.png"));
-//                         playerSprite.setPosition(165+25*j,185-25*i);
-//                         playerSprite.setScale(5);
-//                         this.addChild(playerSprite);
-//                         playerPosition = {x:j, y:i};
-//                         cratesArray[i][j] = null;
-//                         break;
-//                     //木箱の配置
-//                     case 3:
-//                     case 5:
-//                         var crateSprite = cc.Sprite.create(cache.getSpriteFrame("crate.png"));
-//                         crateSprite.setPosition(165+25*j,185-25*i);
-//                         crateSprite.setScale(5);
-//                         this.addChild(crateSprite);
-//                         cratesArray[i][j] = crateSprite;
-//                         break;
-//                     default:
-//                         cratesArray[i][j] = null;
-//                 }
-//             }
+//         var stopBGMusicMenu = new cc.MenuItemFont.create("Stop BG music", this.stopBGMusic, this);
+//         stopBGMusicMenu.setPosition(new cc.Point(0, 250));
+//
+//         var musicUpMenu = new cc.MenuItemFont.create("Music volume Up", this.musicUp, this);
+//         musicUpMenu.setPosition(new cc.Point(0, 200));
+//
+//         var musicDownMenu = new cc.MenuItemFont.create("Music volume Down", this.musicDown, this);
+//         musicDownMenu.setPosition(new cc.Point(0, 150));
+//
+//         var effectsUpMenu = new cc.MenuItemFont.create("Effects volume Up", this.effectsUp, this);
+//         effectsUpMenu.setPosition(new cc.Point(0, 100));
+//
+//         var effectsDownMenu = new cc.MenuItemFont.create("Effects volume Down", this.effectsDown, this);
+//         effectsDownMenu.setPosition(new cc.Point(0, 50));
+//
+//         //Menuクラスに、各MenuItemFontを渡す
+//         var menu = cc.Menu.create(playSoundMenu,playBGMusicMenu,stopBGMusicMenu,musicUpMenu,musicDownMenu,effectsUpMenu,effectsDownMenu);
+//
+//         menu.setPosition(new cc.Point(160,40));
+//         this.addChild(menu);
+//     },
+//     playSound:function(){
+//         this.audioEngine.playEffect(res.bang_mp3);
+//     },
+//     playBGMusic:function(){
+//         if(!this.audioEngine.isMusicPlaying()){
+//             //第二引数trueで、ループを有効にする
+//             this.audioEngine.playEffect(res.loop_mp3,true);
 //         }
-//
-//         cc.eventManager.addListener(listener,this);
+//     },
+//     stopBGMusic:function(){
+//         if(this.audioEngine.isMusicPlaying()){
+//             this.audioEngine.stopMusic();
+//         }
+//     },
+//     musicUp:function(){
+//         this.audioEngine.setMusicVolume(this.audioEngine.getMusicVolume()+0.1);
+//     },
+//     musicDown:function(){
+//         this.audioEngine.setMusicVolume(this.audioEngine.getMusicVolume()-0.1);
+//     },
+//     effectsUp:function(){
+//         this.audioEngine.setEffectsVolume(this.audioEngine.getEffectsVolume()+0.1);
+//     },
+//     effectsDown:function(){
+//         this.audioEngine.setEffectsVolume(this.audioEngine.getEffectsVolume()-0.1);
 //     }
 // });
-//
-//
-//
-//
-// //グローバル関数
-// function swipeDirection(){
-//     var distX = statrTouch.x - endTouch.x;
-//     var distY = statrTouch.y - endTouch.y;
-//
-//     //10px以上で有効なスワイプと見なす
-//     if((Math.abs(distX) + Math.abs(distY)) > swipeTolerance) {
-//         if(Math.abs(distX) > Math.abs(distY)){
-//             //左への移動
-//             if(distX > 0){
-//                 move(-1,0);
-//                 //playerSprite.setPosition(playerSprite.getPosition().x - 25, playerSprite.getPosition().y);
-//                 //右への移動
-//             }else{
-//                 move(1,0);
-//                 // playerSprite.setPosition(playerSprite.getPosition().x + 25, playerSprite.getPosition().y);
-//             }
-//         }else{
-//             //下への移動
-//             if(distY > 0){
-//                 move(0,-1);
-//                 //playerSprite.setPosition(playerSprite.getPosition().x, playerSprite.getPosition().y - 25);
-//                 //上への移動
-//             }else{
-//                 move(0,1);
-//                 //playerSprite.setPosition(playerSprite.getPosition().x, playerSprite.getPosition().y + 25);
-//             }
-//         }
-//     }
-// }
-//
-// function move(deltaX, deltaY){
-//     switch(level[playerPosition.y+deltaY][playerPosition.x+deltaX]){
-//         //隣のセルが床かゴール
-//         case 0:
-//         case 2:
-//             level[playerPosition.y][playerPosition.x] -= 4;
-//             playserPosition.x += deltaX();
-//             playserPosition.y += deltaY();
-//             level[playerPosition.y][playerPosition.x] += 4;
-//             playerSprite.setPosition(165+25*playerPosition.x,185-25*playerPosition.y);
-//             break;
-//         //隣のセルが木箱
-//         case 3:
-//         case 5:
-//             //2個となりのセルが床かゴールの時だけ移動
-//             if(level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==0
-//                 || level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2]==2){
-//                 level[playerPosition.y][playerPosition.x] -= 4;
-//                 playserPosition.x += deltaX();
-//                 playserPosition.y += deltaY();
-//                 level[playerPosition.y][playerPosition.x] += 1;//+4の間違いでは?
-//                 playerSprite.setPosition(165+25*playerPosition.x,185-25*playerPosition.y);
-//                 level[playerPosition.y+deltaY][playerPosition.x+deltaX] += 3;
-//                 var movingCrate = cratesArray[playerPosition.y][playerPositon.x];
-//                 movingCrate.setPosition(movingCrate.getPosition().x+25*deltaX, movingCrate.getPosition().y-25*deltaY);
-//                 cratesArray[playerPosition.y+deltaY][playerPosition.x+deltaX] = movingCrate;
-//                 cratesArray[playerPosition.y][playerPosition.x] = null;
-//                 break;
-//             }
-//     }
-// }
