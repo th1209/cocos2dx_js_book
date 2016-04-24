@@ -17,11 +17,19 @@ const BUTTON_Y_POS = 160;
 var itemsLayer;
 var cart;
 var cartXSpeed = 0;
-// var leftButton;
-// var rightButton;
+
+//左右ボタン使う場合
+var leftButton;
+var rightButton;
+
+//バーチャルパッド使う場合
 var touchOrigin;
 var touching = false;
 var touchEnd;
+
+//ゴーストボタン使う場合
+var detectedX;
+var savedX;
 
 
 
@@ -78,8 +86,27 @@ var game = cc.Layer.extend({
     },
     update:function(dt){
         //バーチャルパッドの場合、以下1行を追加
+        // if(touching){
+        //     cartXSpeed = (touchEnd.getPositionX() - touchOrigin.getPositionX()) / 50;
+        //     if(cartXSpeed > 0){
+        //         cart.setFlippedX(true);
+        //     }
+        //     if(cartXSpeed < 0){
+        //         cart.setFlippedX(false);
+        //     }
+        //     cart.setPosition(cart.getPositionX()+cartXSpeed,cart.getPositionY());
+        // }
+
+        //以下、ゴーストボタンの場合
         if(touching){
-            cartXSpeed = (touchEnd.getPositionX() - touchOrigin.getPositionX()) / 50;
+            var deltaX = detectedX - savedX;
+            if(deltaX > 0){
+                cartXSpeed = CART_ABS_SPEED;
+            }
+            if(deltaX < 0){
+                cartXSpeed = -1 * CART_ABS_SPEED;
+            }
+            savedX = detectedX;//これでフレーム毎にsavedXを更新する
             if(cartXSpeed > 0){
                 cart.setFlippedX(true);
             }
@@ -108,18 +135,27 @@ var touchListener = cc.EventListener.create({
         // return true;
 
         //以下、バーチャルパッド使う場合
-        touchOrigin = cc.Sprite.create(res.touchorigin_png);
-        topLayer.addChild(touchOrigin,0);
-        touchOrigin.setPosition(touch.getLocationX(),touch.getLocationY());
-        touchEnd = cc.Sprite.create(res.touchend_png);
-        topLayer.addChild(touchEnd,0);
-        touchEnd.setPosition(touch.getLocationX(),touch.getLocationY());
+        // touchOrigin = cc.Sprite.create(res.touchorigin_png);
+        // topLayer.addChild(touchOrigin,0);
+        // touchOrigin.setPosition(touch.getLocationX(),touch.getLocationY());
+        // touchEnd = cc.Sprite.create(res.touchend_png);
+        // topLayer.addChild(touchEnd,0);
+        // touchEnd.setPosition(touch.getLocationX(),touch.getLocationY());
+        // touching = true;
+        // return true;
+
+        //以下、ゴーストボタン使う場合
         touching = true;
+        detectedX = touch.getLocationX();
+        savedX = detectedX;
         return true;
     },
     onTouchMoved: function(touch,event){
-      //以下バーチャルバッド使う場合
-      touchEnd.setPosition(touch.getLocationX(),touch.getLocationY());
+        //以下バーチャルバッド使う場合
+        // touchEnd.setPosition(touch.getLocationX(),touch.getLocationY());
+
+        //以下、ゴーストボタン使う場合
+        detectedX = touch.getLocationX();
     },
     onTouchEnded:function(touch,event){
         //以下、左右ボタン使う場合
@@ -128,9 +164,12 @@ var touchListener = cc.EventListener.create({
         // rightButton.setOpacity(BUTTON_OPACITY_DEFAULT);
 
         //以下、バーチャルパッド使う場合
+        // touching = false;
+        // topLayer.removeChild(touchOrigin);
+        // topLayer.removeChild(touchEnd);
+        //
+        //以下、ゴーストボタン使う場合
         touching = false;
-        topLayer.removeChild(touchOrigin);
-        topLayer.removeChild(touchEnd);
     }
 });
 
