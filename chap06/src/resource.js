@@ -3,7 +3,9 @@ var res = {
     cart_png : "res/cart.png",
     strawberry_png : "res/strawberry.png",
     leftbutton_png : "res/leftbutton.png",
-    rightbutton_png : "res/rightbutton.png"
+    rightbutton_png : "res/rightbutton.png",
+    touchorigin_png: "res/touchorigin.png",
+    touchend_png: "res/touchend.png"
 };
 
 var g_resources = [];
