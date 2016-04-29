@@ -52,9 +52,19 @@ var game = cc.Layer.extend({
         //(Box2Dでは、物理オブジェクトと画像が紐づいているわけではない！)
         for(var b = world.GetBodyList(); b; b = b.GetNext()) {  //worldに紐づく一つ一つのオブジェクトを取る
             if(b.GetUserData() != null){                        //userDataが、プログラマが独自に追加したデータ
+                //描画の更新
                 var mySprite = b.GetUserData().asset;
                 mySprite.setPosition(b.GetPosition().x * worldScale, b.GetPosition().y * worldScale); //bodyの現在位置を取る
                 mySprite.setRotation(-1 * cc.radiansToDegress(b.GetAngle()));                         //bodyの角度に合わせて回転
+
+                //トーテムが地面に付いたら、コンソールにログを表示
+                if(b.GetUserData().type == "totem"){
+                    for(var c = b.GetContactList(); c; c = c.m_next){
+                        if(c.other.GetUserData() && c.other.GetUserData().type=="ground"){
+                            console.log("Oh no!!!");
+                        }
+                    }
+                }
             }
         }
     },
