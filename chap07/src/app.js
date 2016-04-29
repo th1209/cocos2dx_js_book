@@ -30,20 +30,41 @@ var game = cc.Layer.extend({
 
         this.scheduleUpdate();
 
-        this.addBody(
-            240, 10,        //中心のx,y座標
-            480, 20,        //bodyのx,yサイズ
-            false,          //動的オブジェクト or 静的オブジェクト。今回は静的オブジェクトなので、物理空間の力(重力etc)の影響を受けない。
-            res.ground_png, //リソースファイル
-            "ground"        //リソース名
-        )
+        this.addBody(240, 10,  480, 20, false, res.ground_png,   "ground");
+        //this.addBody(204, 32,  24,  24, true,  res.brick1x1_png, "destroyable");
+        this.addBody(276, 32,  24,  24, true,  res.brick1x1_png, "destroyable");
+        this.addBody(240, 56,  96,  24, true,  res.brick4x1_png, "destroyable");
+        this.addBody(240, 80,  48,  24, true,  res.brick2x1_png, "solid");
+        this.addBody(228, 104, 72,  24, true,  res.brick3x1_png, "destroyable");
+        this.addBody(240, 140, 96,  48, true,  res.brick4x2_png, "solid");
+        this.addBody(240, 188, 24,  48, true,  res.totem_png,    "totem");
+        
     },
     update: function(dt){
         //update関数の第一引数はdeltaでl、前フレームからの経過時間を表す。
         //残り二つの引数は、速度と位置の繰り返し計算回数を表す。
         world.Step(dt,10,10);
-        console.log(world);
+
+        //物理オブジェクトの状態に応じて、Spriteの描画を更新する
+        //(Box2Dでは、物理オブジェクトと画像が紐づいているわけではない！)
+        for(var b = world.GetBodyList(); b; b = b.GetNext()) {  //worldに紐づく一つ一つのオブジェクトを取る
+            if(b.GetUserData() != null){                        //userDataが、プログラマが独自に追加したデータ
+                var mySprite = b.GetUserData().asset;
+                mySprite.setPosition(b.GetPosition().x * worldScale, b.GetPosition().y * worldScale); //bodyの現在位置を取る
+                mySprite.setRotation(-1 * cc.radiansToDegress(b.GetAngle()));                         //bodyの角度に合わせて回転
+            }
+        }
     },
+    /**
+     * 
+     * @param posX 中心のx座標
+     * @param posY 中心のy座標
+     * @param width 幅
+     * @param height 高さ
+     * @param isDynamic 動的オブジェクトか静的オブジェクトか
+     * @param spriteImage リソースファイル
+     * @param type リソース名
+     */
     addBody: function(posX,posY,width,height,isDynamic,spriteImage,type){
 
         //b2FixtureDefクラス。名前の通り、物体の材質を決めるようだ。
