@@ -30,14 +30,17 @@ var game = cc.Layer.extend({
 
         this.scheduleUpdate();
 
+        //物理オブェクトを追加
         this.addBody(240, 10,  480, 20, false, res.ground_png,   "ground");
-        //this.addBody(204, 32,  24,  24, true,  res.brick1x1_png, "destroyable");
+        this.addBody(204, 32,  24,  24, true,  res.brick1x1_png, "destroyable");
         this.addBody(276, 32,  24,  24, true,  res.brick1x1_png, "destroyable");
         this.addBody(240, 56,  96,  24, true,  res.brick4x1_png, "destroyable");
         this.addBody(240, 80,  48,  24, true,  res.brick2x1_png, "solid");
         this.addBody(228, 104, 72,  24, true,  res.brick3x1_png, "destroyable");
         this.addBody(240, 140, 96,  48, true,  res.brick4x2_png, "solid");
         this.addBody(240, 188, 24,  48, true,  res.totem_png,    "totem");
+
+        cc.eventManager.addListener(touchListener, this);
         
     },
     update: function(dt){
@@ -100,5 +103,25 @@ var game = cc.Layer.extend({
         //bodyオブジェクトにfixtureDefを紐づける
         body.CreateFixture(fixtureDef);
     }
+});
 
+var touchListener = cc.EventListener.create({
+    event: cc.EventListener.TOUCH_ONE_BY_ONE,
+    swallowTouches: true,
+    onTouchBegan: function(touch, event){
+        //物理空間上での座標に変換
+        var worldPoint = new Box2D.Common.Math.b2Vec2(touch.getLocation().x/worldScale, touch.getLocation().y/worldScale);
+        for(var b = world.GetBodyList(); b; b = b.GetNext()){
+            if(b.GetUserData() != null && b.GetUserData().type == "destroyable"){
+                for(var f = b.GetFixtureList(); f; f = f.GetNext()){
+                    //これで、座標がFixtureの範囲内に含まれるかどうか取れる
+                    if(f.TestPoint(worldPoint)){
+                        //スプライトと物理オブジェクトの両方を削除する
+                        gameLayer.removeChild(b.GetUserData().asset);
+                        world.DestroyBody(b);
+                    }
+                }
+            }
+        }
+    }
 });
