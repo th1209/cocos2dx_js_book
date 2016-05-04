@@ -6,7 +6,9 @@ var yFieldSize = 6; //y座標のglobezの個数
 var tileTypes  = ["red","green","blue","grey","yellow"];
 var tileSize   = 50; //globez一個あたりのピクセル数(縦横両方)
 var tileArray  = []; //ここにglobezオブジェクトを格納
+var backGroundLayer;
 var globezLayer;    //globezSpriteは、このレイヤーに貼付ける
+var arrowsLayer;    //マウスの軌跡を描画するレイヤー
 var startColor = null;
 var visitTiles = [];
 var tolerance  = 20; //タッチ時に許容する中心からのピクセル数(縦横両方)。
@@ -29,7 +31,7 @@ var game = cc.Layer.extend({
 
         cc.spriteFrameCache.addSpriteFrames(res.globes_plist, res.globes_png);
 
-        var backGroundLayer =  cc.LayerGradient.create(
+        backGroundLayer =  cc.LayerGradient.create(
             cc.color(0x00, 0x22, 0x22, 255),
             cc.color(0x22, 0x00, 0x44, 255)
         );
@@ -37,6 +39,9 @@ var game = cc.Layer.extend({
 
         globezLayer = cc.Layer.create();
         this.addChild(globezLayer);
+
+        arrowsLayer = cc.DrawNode.create();
+        this.addChild(arrowsLayer);
 
         this.createLevel();
 
@@ -101,6 +106,8 @@ var touchListener = cc.EventListener.create({
             return;
         }
 
+        this.drawPath();
+
         //タイルが隣接していないならダメ
         var tileYDiff = Math.abs(currentRow - visitTiles[visitTiles.length - 1].row);
         var tileXDiff = Math.abs(currentCol - visitTiles[visitTiles.length - 1].col);
@@ -137,6 +144,9 @@ var touchListener = cc.EventListener.create({
         }
     },
     onMouseUp: function(event) {
+        //軌跡の削除
+        arrowsLayer.clear();
+
         startColor = null;
         for(i = 0; i< visitTiles.length; i++){
             if(visitTiles.length < 3){
@@ -209,7 +219,19 @@ var touchListener = cc.EventListener.create({
         sprite.runAction(moveAction);
 
         tileArray[row][col] = sprite;
-
+    },
+    drawPath: function(){
+      arrowsLayer.clear();
+      if(visitTiles.length > 0){
+        for(var i = 1; i<visitTiles.length; i++){
+            arrowsLayer.drawSegment(
+                new cc.Point(visitTiles[i-1].col * tileSize + tileSize/2, visitTiles[i-1].row * tileSize + tileSize/2),
+                new cc.Point(visitTiles[i].col * tileSize + tileSize/2,   visitTiles[i].row * tileSize + tileSize/2),
+                4,
+                cc.color(255,255,255,128)
+            );
+        }
+      }
     }
 });
 
