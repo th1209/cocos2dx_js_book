@@ -143,10 +143,41 @@ var touchListener = cc.EventListener.create({
                 tileArray[visitTiles[i].row][visitTiles[i].col].setOpacity(255);
                 tileArray[visitTiles[i].row][visitTiles[i].col].picked = false;
             }else{
+                //タイルの削除処理
                 globezLayer.removeChild(tileArray[visitTiles[i].row][visitTiles[i].col]);
-                tileArray[visitTiles[i].row][visitTiles[i].col] = null
+                tileArray[visitTiles[i].row][visitTiles[i].col] = null;
             }
         }
+
+        if(visitTiles.length >= 3){
+            //タイルの落下処理
+            for(y = 1; y < yFieldSize; y++){//yは、最下列は計算しなくてよい
+                for(x = 0; x < xFieldSize; x++){
+                    //削除されていないタイルのみ
+                    if(tileArray[y][x] != null){
+                        //下行に、何個削除されたタイルがあるか求める
+                        var holesBellow = 0;
+                        for(dY = y - 1; dY >= 0; dY--){
+                            if(tileArray[dY][x] == null){
+                                holesBellow++;
+                            }
+                        }
+                        //落下処理
+                        if(holesBellow > 0){
+                            //落下アクション実行
+                            var moveAction = cc.MoveTo.create(0.5, new cc.Point(tileArray[y][x].x, tileArray[y][x].y - holesBellow * tileSize));
+                            tileArray[y][x].runAction(moveAction);
+
+                            //配列の値を置き換える
+                            tileArray[y-holesBellow][x] = tileArray[y][x];
+                            tileArray[y][x] = null;
+                        }
+                    }
+                }
+            }
+
+        }
+        visitTiles = [];
     }
 });
 
