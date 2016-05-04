@@ -139,8 +139,13 @@ var touchListener = cc.EventListener.create({
     onMouseUp: function(event) {
         startColor = null;
         for(i = 0; i< visitTiles.length; i++){
-            tileArray[visitTiles[i].row][visitTiles[i].col].setOpacity(255);
-            tileArray[visitTiles[i].row][visitTiles[i].col].picked = false;
+            if(visitTiles.length < 3){
+                tileArray[visitTiles[i].row][visitTiles[i].col].setOpacity(255);
+                tileArray[visitTiles[i].row][visitTiles[i].col].picked = false;
+            }else{
+                globezLayer.removeChild(tileArray[visitTiles[i].row][visitTiles[i].col]);
+                tileArray[visitTiles[i].row][visitTiles[i].col] = null
+            }
         }
     }
 });
