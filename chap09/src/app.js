@@ -3,12 +3,14 @@
  */
 var xFieldSize = 6; //x座標のglobezの個数
 var yFieldSize = 6; //y座標のglobezの個数
-var tileTypes = ["red","green","blue","grey","yellow"];
-var tileSize  = 50; //globez一個あたりのピクセル数(縦横両方)
-var tileArray = []; //ここにglobezオブジェクトを格納
+var tileTypes  = ["red","green","blue","grey","yellow"];
+var tileSize   = 50; //globez一個あたりのピクセル数(縦横両方)
+var tileArray  = []; //ここにglobezオブジェクトを格納
 var globezLayer;    //globezSpriteは、このレイヤーに貼付ける
 var startColor = null;
 var visitTiles = [];
+var tolerance  = 20; //タッチ時に許容する中心からのピクセル数(縦横両方)。
+                     //普通は我慢、耐久とかの意味だが、ここでは許容誤差を示す。ゲームだとこっちの意味をよく使う。
 
 
 
@@ -37,7 +39,6 @@ var game = cc.Layer.extend({
         this.addChild(globezLayer);
 
         this.createLevel();
-        console.log(tileArray);
 
         cc.eventManager.addListener(touchListener, this);
     },
@@ -79,6 +80,61 @@ var touchListener = cc.EventListener.create({
             row: pickedRow,
             col: pickedCol
         });
+    },
+    onMouseMove: function(event){
+        //startColorがnullならダメ
+        if(startColor == null){
+            return;
+        }
+
+        //必要な値は先に計算しておく
+        var currentRow = Math.floor(event._y / tileSize);
+        var currentCol = Math.floor(event._x / tileSize);
+        var centerY = currentRow * tileSize + tileSize / 2;
+        var centerX = currentCol * tileSize + tileSize / 2;
+        var distY = event._y - centerY;
+        var distX = event._x - centerX;
+
+        //許容範囲外ならダメ(ピタゴラスの定理)
+        //これよく使うと思うので、覚えておくこと
+        if((distX * distX) + (distY * distY) > (tolerance * tolerance)){
+            return;
+        }
+
+        //タイルが隣接していないならダメ
+        var tileYDiff = Math.abs(currentRow - visitTiles[visitTiles.length - 1].row);
+        var tileXDiff = Math.abs(currentCol - visitTiles[visitTiles.length - 1].col);
+        if(! (tileYDiff <= 1 && tileXDiff <= 1)){
+            return;
+        }
+
+        //最初にタッチしたタイルと違う色ならダメ
+        if(tileArray[currentRow][currentCol].val !== startColor) {
+            return;
+        }
+
+        //未選択のタイル
+        if(! tileArray[currentRow][currentCol].picked) {
+            //選択したタイルに対し処理実施
+            tileArray[currentRow][currentCol].setOpacity(128);
+            tileArray[currentRow][currentCol].picked = true;
+            visitTiles.push({
+                row:currentRow,
+                col:currentCol
+            });
+        }else{
+            //選択したタイルが、一つ前のタイルと一致
+            if(visitTiles.length >= 2 &&
+               currentRow == visitTiles[visitTiles.length - 2].row &&
+               currentCol == visitTiles[visitTiles.length - 2].col){
+                //最新のタイルを破棄する
+                var recentTileRow = visitTiles[visitTiles.length - 1].row;
+                var recentTileCol = visitTiles[visitTiles.length - 1].col;
+                tileArray[recentTileRow][recentTileCol].setOpacity(255);
+                tileArray[recentTileRow][recentTileCol].picked = false;
+                visitTiles.pop();
+            }
+        }
     },
     onMouseUp: function(event) {
         startColor = null;
