@@ -149,8 +149,8 @@ var touchListener = cc.EventListener.create({
             }
         }
 
+        //タイルの落下処理
         if(visitTiles.length >= 3){
-            //タイルの落下処理
             for(y = 1; y < yFieldSize; y++){//yは、最下列は計算しなくてよい
                 for(x = 0; x < xFieldSize; x++){
                     //削除されていないタイルのみ
@@ -177,7 +177,39 @@ var touchListener = cc.EventListener.create({
             }
 
         }
+
+        //新規タイルの生成処理
+        for(x = 0; x < xFieldSize; x++){
+            for(y = yFieldSize-1; y >= 0; y--){
+                if(tileArray[y][x] != null){//補足：前の落下処理で、タイルは全て落下した状態
+                    break;
+                }
+            }
+            var missingGlobes = (yFieldSize - 1) - y;//注意。for文で回した後のyを使っている
+            if(missingGlobes > 0){
+                for(y = 0; y < missingGlobes; y++){
+                    this.fallTile(yFieldSize-1-y, x, missingGlobes - y);
+                }
+            }
+        }
         visitTiles = [];
+    },
+    fallTile: function(row, col, height) {
+        var randomTile = Math.floor(Math.random() * tileTypes.length);
+
+        var spriteFrame = cc.spriteFrameCache.getSpriteFrame(tileTypes[randomTile]);
+        var sprite = cc.Sprite.createWithSpriteFrame(spriteFrame);
+        sprite.val = randomTile;
+        sprite.picked = false;
+
+        globezLayer.addChild(sprite, 0);
+        sprite.setPosition(col*tileSize+tileSize/2, (yFieldSize+height) * tileSize);//最初のy座標は、yFieldSize * tileSizeでスプライトを生成しておく
+
+        var moveAction = cc.MoveTo.create(0.5, new cc.Point(col*tileSize+tileSize/2, row*tileSize+tileSize/2));
+        sprite.runAction(moveAction);
+
+        tileArray[row][col] = sprite;
+
     }
 });
 
