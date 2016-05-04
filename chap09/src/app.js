@@ -4,9 +4,13 @@
 var xFieldSize = 6; //x座標のglobezの個数
 var yFieldSize = 6; //y座標のglobezの個数
 var tileTypes = ["red","green","blue","grey","yellow"];
-var tileSize  = 50;  //globez一個あたりのピクセル数(縦横両方)
+var tileSize  = 50; //globez一個あたりのピクセル数(縦横両方)
 var tileArray = []; //ここにglobezオブジェクトを格納
-var globezLayer;
+var globezLayer;    //globezSpriteは、このレイヤーに貼付ける
+var startColor = null;
+var visitTiles = [];
+
+
 
 var gameScene = cc.Scene.extend({
     onEnter:function () {
@@ -33,6 +37,9 @@ var game = cc.Layer.extend({
         this.addChild(globezLayer);
 
         this.createLevel();
+        console.log(tileArray);
+
+        cc.eventManager.addListener(touchListener, this);
     },
     createLevel:function (){
         for(var y = 0; y < yFieldSize  ;y++){
@@ -53,7 +60,32 @@ var game = cc.Layer.extend({
         globezLayer.addChild(sprite, 0);
         sprite.setPosition(col * tileSize + tileSize / 2, row * tileSize + tileSize / 2)
 
-        tileArray = [row][col] = sprite;
+        tileArray[row][col] = sprite;
+    }
+});
+
+var touchListener = cc.EventListener.create({
+    event: cc.EventListener.MOUSE,
+    onMouseDown: function (event) {
+        var pickedRow = Math.floor(event._y / tileSize);
+        var pickedCol = Math.floor(event._x / tileSize);
+
+        tileArray[pickedRow][pickedCol].setOpacity(128);
+        tileArray[pickedRow][pickedCol].picked = true;
+
+        startColor = tileArray[pickedRow][pickedCol].val;
+
+        visitTiles.push({
+            row: pickedRow,
+            col: pickedCol
+        });
+    },
+    onMouseUp: function(event) {
+        startColor = null;
+        for(i = 0; i< visitTiles.length; i++){
+            tileArray[visitTiles[i].row][visitTiles[i].col].setOpacity(255);
+            tileArray[visitTiles[i].row][visitTiles[i].col].picked = false;
+        }
     }
 });
 
